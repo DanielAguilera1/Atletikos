@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import mainPhoto from "../img/MainPhoto.png";
-import comunidadPhoto from "../img/svg/people-svgrepo-com.svg";
-import shoePhoto from "../img/svg/shoes-4-svgrepo-com.svg";
-import mountainPhoto from "../img/svg/mountain-svgrepo-com.svg";
-import heartPhoto from "../img/svg/heart-svgrepo-com.svg";
+import mainPhoto from "@/img/MainPhoto.png";
+import comunidadPhoto from "@/img/svg/people-svgrepo-com.svg";
+import shoePhoto from "@/img/svg/shoes-4-svgrepo-com.svg";
+import mountainPhoto from "@/img/svg/mountain-svgrepo-com.svg";
+import heartPhoto from "@/img/svg/heart-svgrepo-com.svg";
 
 export default function Home() {
   return (

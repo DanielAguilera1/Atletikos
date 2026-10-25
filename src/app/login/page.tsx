@@ -1,10 +1,58 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import registerPhoto from "../../img/LoginRegisterPhoto.png";
 import mailIcon from "../../img/svg/mail-svgrepo-com.svg";
 import lockIcon from "../../img/svg/lock-svgrepo-com.svg";
+import { useState } from "react";
 
 export default function LoginPage() {
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const user = {
+      email: formData.get("email"),
+      contrasena: formData.get("contrasena"),
+    };
+
+    setLoading(true);
+
+    try {
+      console.log("Datos del usuario a enviar:", user);
+      const response = await fetch("http://localhost:8080/api/Auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email,
+          contrasena: user.contrasena,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (response.ok) {
+        alert("El registro fue procesado.");
+        console.log("Respuesta de la API:", data);
+      } else {
+        alert(`La API respondió con error: ${response.status}`);
+        console.error("Error de la API:", data);
+      }
+    } catch (error) {
+      alert("No se pudo conectar con la API." + error);
+      console.error("Error de conexión:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <body className="bg-black text-white">
       <div className="min-h-screen flex">
@@ -52,46 +100,63 @@ export default function LoginPage() {
               Accede a tu cuenta para continuar
             </p>
 
-            <div className="mb-4">
-              <label className="block text-sm mb-2">Correo electrónico</label>
-              <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2">
-                <Image src={mailIcon} alt="mail" className="h-6 w-6 mr-2" />
+            <form onSubmit={handleLogin}>
+              <div className="mb-4">
+                <label className="block text-sm mb-2" htmlFor="email">
+                  Correo electrónico
+                </label>
+                <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2">
+                  <Image src={mailIcon} alt="mail" className="h-6 w-6 mr-2" />
 
-                <input
-                  type="email"
-                  placeholder="tu@email.com"
-                  className="bg-transparent w-full outline-none text-white"
-                />
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="tu@email.com"
+                    className="bg-transparent w-full outline-none text-white"
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="mb-4">
-              <label className="block text-sm mb-2">Contraseña</label>
-              <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2">
-                <Image src={lockIcon} alt="Password" className="h-6 w-6 mr-2" />
-                <input
-                  type="password"
-                  placeholder="Ingresa tu contraseña"
-                  className="bg-transparent w-full outline-none text-white"
-                />
-                <span className="text-gray-400 cursor-pointer">👁️</span>
+              <div className="mb-4">
+                <label className="block text-sm mb-2" htmlFor="contrasena">
+                  Contraseña
+                </label>
+                <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2">
+                  <Image
+                    src={lockIcon}
+                    alt="Password"
+                    className="h-6 w-6 mr-2"
+                  />
+                  <input
+                    type="password"
+                    id="contrasena"
+                    name="contrasena"
+                    placeholder="Ingresa tu contraseña"
+                    className="bg-transparent w-full outline-none text-white"
+                  />
+                  <span className="text-gray-400 cursor-pointer">👁️</span>
+                </div>
               </div>
-            </div>
 
-            <div className="flex justify-between items-center text-sm mb-6">
-              <label className="flex items-center space-x-2">
-                <input type="checkbox" className="accent-lime-400" />
-                <span>Recordarme</span>
-              </label>
+              <div className="flex justify-between items-center text-sm mb-6">
+                <label className="flex items-center space-x-2">
+                  <input type="checkbox" className="accent-lime-400" />
+                  <span>Recordarme</span>
+                </label>
 
-              <a href="#" className="text-lime-400 hover:underline">
-                ¿Olvidaste tu contraseña?
-              </a>
-            </div>
+                <a href="#" className="text-lime-400 hover:underline">
+                  ¿Olvidaste tu contraseña?
+                </a>
+              </div>
 
-            <button className="w-full bg-lime-400 text-black font-bold py-3 rounded-lg hover:bg-lime-300 transition">
-              INICIAR SESIÓN
-            </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-lime-400 text-black font-bold py-3 rounded-lg hover:bg-lime-300 transition disabled:opacity-50">
+                {loading ? "INICIANDO..." : "INICIAR SESIÓN"}
+              </button>
+            </form>
 
             <div className="flex items-center my-6">
               <div className="grow h-px bg-zinc-700"></div>

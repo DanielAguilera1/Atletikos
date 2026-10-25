@@ -1,14 +1,69 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import registerPhoto from "../../img/LoginRegisterPhoto.png";
-import personIcon from "../../img/svg/person.svg";
-import mailIcon from "../../img/svg/mail-svgrepo-com.svg";
-import lockIcon from "../../img/svg/lock-svgrepo-com.svg";
-import calendarIcon from "../../img/svg/calendar.svg";
-import rulerIcon from "../../img/svg/ruler.svg";
-import weightIcon from "../../img/svg/weight.svg";
+import registerPhoto from "@/img/LoginRegisterPhoto.png";
+import personIcon from "@/img/svg/person.svg";
+import mailIcon from "@/img/svg/mail-svgrepo-com.svg";
+import lockIcon from "@/img/svg/lock-svgrepo-com.svg";
+import calendarIcon from "@/img/svg/calendar.svg";
+import { useState } from "react";
 
 export default function RegisterPage() {
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const user = {
+      nombre: formData.get("nombre"),
+      apellido: formData.get("apellido"),
+      email: formData.get("email"),
+      contrasena: formData.get("contrasena"),
+      fechaNacimiento: formData.get("fechaNacimiento"),
+    };
+
+    setLoading(true);
+
+    try {
+      console.log("Datos del usuario a enviar:", user);
+      const response = await fetch("http://localhost:8080/api/Auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: user.nombre,
+          apellido: user.apellido,
+          email: user.email,
+          contrasena: user.contrasena,
+          fechaNacimiento: user.fechaNacimiento,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (response.ok) {
+        alert("El registro fue procesado.");
+        console.log("Respuesta de la API:", data);
+      } else {
+        alert(`La API respondió con error: ${response.status}`);
+        console.error("Error de la API:", data);
+      }
+    } catch (error) {
+      alert(
+        "No se pudo conectar con la API. Revisa que el backend esté activo y que CORS esté configurado. " +
+          error,
+      );
+      console.error("Error de conexión:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <body className="bg-black text-white">
       <div className="min-h-screen flex">
@@ -54,10 +109,10 @@ export default function RegisterPage() {
               Completa tus datos para comenzar
             </p>
 
-            <form>
-              <div className="mb-2 flex">
+            <form onSubmit={handleRegister}>
+              <div className="mb-4 flex">
                 <div>
-                  <label className="block text-sm" htmlFor="firstName">
+                  <label className="block text-sm mb-2" htmlFor="nombre">
                     Nombre
                   </label>
                   <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-2 mr-2.5">
@@ -69,7 +124,8 @@ export default function RegisterPage() {
 
                     <input
                       type="text"
-                      id="firstName"
+                      name="nombre"
+                      id="nombre"
                       placeholder="Juan"
                       className="bg-transparent w-full outline-none text-white"
                     />
@@ -77,7 +133,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm" htmlFor="surname">
+                  <label className="block text-sm mb-2" htmlFor="apellido">
                     Apellido
                   </label>
                   <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-2">
@@ -85,7 +141,8 @@ export default function RegisterPage() {
 
                     <input
                       type="text"
-                      id="surname"
+                      name="apellido"
+                      id="apellido"
                       placeholder="Perez"
                       className="bg-transparent w-full outline-none text-white"
                     />
@@ -93,21 +150,27 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="mb-2">
-                <label className="block text-sm mb-2">Correo electrónico</label>
+              <div className="mb-4">
+                <label className="block text-sm mb-2" htmlFor="email">
+                  Correo electrónico
+                </label>
                 <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-2">
                   <Image src={mailIcon} alt="mail" className="h-6 w-6 mr-2" />
 
                   <input
                     type="email"
+                    id="email"
+                    name="email"
                     placeholder="tu@email.com"
                     className="bg-transparent w-full outline-none text-white"
                   />
                 </div>
               </div>
 
-              <div className="mb-2">
-                <label className="block text-sm mb-2">Contraseña</label>
+              <div className="mb-4">
+                <label className="block text-sm mb-2" htmlFor="contrasena">
+                  Contraseña
+                </label>
                 <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-2">
                   <Image
                     src={lockIcon}
@@ -116,6 +179,8 @@ export default function RegisterPage() {
                   />
                   <input
                     type="password"
+                    id="contrasena"
+                    name="contrasena"
                     placeholder="Ingresa tu contraseña"
                     className="bg-transparent w-full outline-none text-white"
                   />
@@ -123,8 +188,8 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <div className="mb-2">
-                <label className="block text-sm mb-2" htmlFor="date">
+              <div className="mb-4">
+                <label className="block text-sm mb-2" htmlFor="fechaNacimiento">
                   Fecha de nacimiento
                 </label>
                 <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-2">
@@ -134,53 +199,12 @@ export default function RegisterPage() {
                     className="h-6 w-6 mr-2"
                   />
                   <input
-                    id="date"
+                    id="fechaNacimiento"
+                    name="fechaNacimiento"
                     type="date"
                     placeholder="Seleccionar tu fecha"
                     className="bg-transparent w-full outline-none text-white"
                   />
-                </div>
-              </div>
-
-              <div className="mb-4 flex">
-                <div>
-                  <label className="block text-sm" htmlFor="Height">
-                    Altura (cm)
-                  </label>
-                  <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-2 mr-2.5">
-                    <Image
-                      src={rulerIcon}
-                      alt="Ruler"
-                      className="h-6 w-6 mr-2"
-                    />
-
-                    <input
-                      type="text"
-                      id="Height"
-                      placeholder="1.70"
-                      className="bg-transparent w-full outline-none text-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm" htmlFor="weight">
-                    Peso (kg)
-                  </label>
-                  <div className="flex items-center bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-2">
-                    <Image
-                      src={weightIcon}
-                      alt="Weight"
-                      className="h-6 w-6 mr-2"
-                    />
-
-                    <input
-                      type="text"
-                      id="weight"
-                      placeholder="60"
-                      className="bg-transparent w-full outline-none text-white"
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -189,18 +213,25 @@ export default function RegisterPage() {
                   <input type="checkbox" className="accent-lime-400" />
                   <span>
                     Acepto los
-                    <span className="text-lime-400">
+                    <span className="text-lime-400 ml-1">
                       Términos y condiciones
                     </span>
                   </span>
                 </label>
               </div>
 
-              <input
+              {/* <input > 
                 type="submit"
                 value="CREAR CUENTA"
                 className="w-full bg-lime-400 text-black font-bold py-3 rounded-lg hover:bg-lime-300 transition"
-              />
+              /> */}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-lime-400 text-black font-bold py-3 rounded-lg hover:bg-lime-300 transition disabled:opacity-50">
+                {loading ? "CONECTANDO..." : "CREAR CUENTA"}
+              </button>
             </form>
 
             <div className="flex items-center my-6">
