@@ -39,8 +39,7 @@ export default function LoginPage() {
       const data = await response.json().catch(() => null);
 
       if (response.ok) {
-        alert("El registro fue procesado.");
-        console.log("Respuesta de la API:", data);
+        alert("Logeado Correctamente");
       } else {
         alert(`La API respondió con error: ${response.status}`);
         console.error("Error de la API:", data);
